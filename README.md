@@ -10,7 +10,7 @@ A library helps Android built-in views easy and convenient to set round rectangl
 https://github.com/H07000223/FlycoRoundView
 
 square 三件套    okhttp   retrofit   picasso（Glide）
-以上3个都是square出品，至于Glide是google推荐，应该算是网络3套装了吧
+以上3个都是square出品，至于Glide是google推荐，应该算是网络3套装了吧（retrofit基本全是采用接口形式，不喜欢，一开始就是用还好，半路切换就尴尬了，所以这个看自己的了）
 http://square.github.io/#android
 
 
