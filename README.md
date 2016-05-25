@@ -28,7 +28,6 @@ OkHttpUtils.post(url, params, new OkHttpHandler() {
                     }
                 });
             }
-
             @Override
             void failure() {
                 Log.d("vvv", "failure");
