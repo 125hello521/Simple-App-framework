@@ -1,7 +1,5 @@
 package com.net.volley;
 
-import android.util.Log;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
@@ -38,7 +36,7 @@ public class OkHttpUtils {
         return okHttpClient;
     }
 
-    public static void get(String url, RequestParams params) {
+    public static void get(String url, OkHttpParams params, final OkHttpHandler handler) {
         if (params != null) {
             // Construct the query string and trim it, in case it
             // includes any excessive white spaces.
@@ -54,16 +52,17 @@ public class OkHttpUtils {
                 }
             }
         }
+        handler.start();
         call = getClient().newCall(new Request.Builder().url(url).build());
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-
+                handler.failure();
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                Log.d("vvv", response.body().string());
+                handler.success(response.body().string());
             }
         });
     }
@@ -74,7 +73,7 @@ public class OkHttpUtils {
         }
     }
 
-    public static void post(String url, RequestParams params) {
+    public static void post(String url, OkHttpParams params, final OkHttpHandler handler) {
         if (params.haveData()) {
             RequestBody body = null;
             if (!params.urlParams.isEmpty() && params.streamParams.isEmpty() && params.fileParams.isEmpty() && params.fileArrayParams.isEmpty()) {
@@ -97,8 +96,8 @@ public class OkHttpUtils {
                 if (!params.fileParams.isEmpty()) {
                     Iterator iter = params.fileParams.entrySet().iterator();
                     while (iter.hasNext()) {
-                        Map.Entry<String, RequestParams.FileWrapper> entry = (Map.Entry<String, RequestParams.FileWrapper>) iter.next();
-                        RequestParams.FileWrapper fileWrapper = entry.getValue();
+                        Map.Entry<String, OkHttpParams.FileWrapper> entry = (Map.Entry<String, OkHttpParams.FileWrapper>) iter.next();
+                        OkHttpParams.FileWrapper fileWrapper = entry.getValue();
                         File file = fileWrapper.file;
                         if (file.getName().endsWith(".jpg")) {
                             builder.addFormDataPart(entry.getKey(), file.getName(), RequestBody.create(MEDIA_TYPE_JPG, entry.getValue().file));
@@ -111,16 +110,17 @@ public class OkHttpUtils {
                 }
                 body = builder.build();
             }
+            handler.start();
             call = getClient().newCall(new Request.Builder().url(url).post(body).build());
             call.enqueue(new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
-
+                    handler.failure();
                 }
 
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
-                    Log.d("vvv", response.body().string());
+                    handler.success(response.body().string());
                 }
             });
         }
