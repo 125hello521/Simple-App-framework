@@ -1,5 +1,7 @@
 package com.net.volley;
 
+import android.util.Log;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
@@ -61,7 +63,7 @@ public class OkHttpUtils {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-
+                Log.d("vvv", response.body().string());
             }
         });
     }
@@ -93,7 +95,7 @@ public class OkHttpUtils {
                     }
                 }
                 if (!params.fileParams.isEmpty()) {
-                    Iterator iter = params.urlParams.entrySet().iterator();
+                    Iterator iter = params.fileParams.entrySet().iterator();
                     while (iter.hasNext()) {
                         Map.Entry<String, RequestParams.FileWrapper> entry = (Map.Entry<String, RequestParams.FileWrapper>) iter.next();
                         RequestParams.FileWrapper fileWrapper = entry.getValue();
@@ -118,7 +120,7 @@ public class OkHttpUtils {
 
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
-
+                    Log.d("vvv", response.body().string());
                 }
             });
         }
