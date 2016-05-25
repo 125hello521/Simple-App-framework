@@ -11,7 +11,6 @@ https://github.com/H07000223/FlycoRoundView
 
 square 三件套    okhttp   retrofit   picasso（Glide）
 以上3个都是square出品，至于Glide是google推荐，应该算是网络3套装了吧（retrofit基本全是采用接口形式，不喜欢，一开始就是用还好，半路切换就尴尬了，所以这个看自己的了）
-http://square.github.io/#android
 -----------------------------------------------------------------------------------------------------------------------------------------
 接下来时自己的一些对于Okhttp的简单封装，RequestParams来自async-http，存放body数据。OkhttpUtils是简单的封装，由于个人项目仅用到简单键值对和不同字段、多张上传图片，故仅判断这2种情况。需要的自己进一步修改，个人感觉没必要完全用别人的，满足功能就行
 
