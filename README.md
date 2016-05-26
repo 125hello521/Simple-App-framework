@@ -20,53 +20,59 @@ square 三件套    okhttp   retrofit   picasso（Glide）
 -------------------------------------------------------------------------------------------------------------------------------------
 
           get,post
-          OkHttpUtils.post(url, params, new OkHttpHandler() {
-             @Override
-             void success(final String result) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        tv.setText(result);
-                    }
-                });
-               }
-              @Override
-              void failure() {
-                Log.d("vvv", "failure");
-              }
-           });
-            下载文件
-             OkHttpUtils.downLoad(jd, null, new OkHttpHandler() {
-              @Override
-              void progress(final long downloadSize, final long totalSize, final boolean is) {
-                super.progress(downloadSize, totalSize, is);
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        tv.setText(downloadSize + "---" + totalSize + "---" + is);
-                    }
-                });
-              }
-            
-              @Override
-              void success(String result) {}
-           
-              @Override
-              void success(InputStream inputStream) {
-                 //File file = new File("/mnt/sdcard/abc.apk");
-                 //if (!file.exists()) {
-                    //try {
-                        //file.createNewFile();
-                    //} catch (IOException e) {
-                        //e.printStackTrace();
-                    //}
-                 //}
-                 //OkHttpFileUtils.inputstream2file(inputStream, file);
-              }
+          OkHttpParams params = new OkHttpParams();
+        params.put("token", "186392761821464256312665");
+        try {
+            params.put("avatar", new File("/mnt/sdcard/DCIM/Camera/123.jpg"));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        OkHttpUtils.post(post, params, new OkHttpHandler() {
+            @Override
+            void success(final String result) {
+                tv.setText(result);
+            }
 
-              @Override
-              void failure() {}
+            @Override
+            void failure() {
+                tv.setText("failure()");
+            }
+        });
+            下载文件
+              OkHttpUtils.downLoad(jd, null, new OkHttpHandler() {
+            @Override
+            void progress(final long downloadSize, final long totalSize, final boolean is) {
+                tv.setText(downloadSize + "---" + totalSize + "---" + is);
+            }
+
+            @Override
+            void success(String result) {
+            }
+
+            @Override
+            void success(InputStream inputStream) {
+                file = new File("/mnt/sdcard/abc.apk");
+                if (!file.exists()) {
+                    try {
+                        file.createNewFile();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                OkHttpFileUtils.inputstream2file(inputStream, file);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        tv.setText(file.getName());
+                    }
+                });
+            }
+
+            @Override
+            void failure() {
+
+            }
         });
 -------------------------------------------------------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------------------------------------------------
-Mark:enqueue(CallBack call)是非ui线程，返回结果要在ui线程展示需要用runOnUiThread()方法，目前写到这里
+Mark:下载文件成功返回InputStream，是异步线程，可以进行文件操作，且不占主线程，返回结果要在ui线程展示需要用runOnUiThread()方法
