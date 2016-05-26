@@ -1,13 +1,19 @@
-package com.net.volley;
+package com.ejlchina.ejl.utils;
 
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
+
+import com.ejlchina.ejl.base.EjlApplication;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.Cache;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -18,6 +24,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+
 /**
  * linshao    lhl_012@163.com
  * 2016年5月26日18:03:34
@@ -28,6 +35,7 @@ public class OkHttpUtils {
     private static final MediaType MEDIA_TYPE_JPG = MediaType.parse("image/jpg");
     private volatile static OkHttpClient okHttpClient = null;
     private static Call call;
+    private static Cache cache;
 
     private static OkHttpClient getClient() {
         if (okHttpClient == null) {
@@ -36,6 +44,7 @@ public class OkHttpUtils {
                     okHttpClient = new OkHttpClient();
                     okHttpClient.newBuilder().readTimeout(10, TimeUnit.SECONDS);
                     okHttpClient.newBuilder().connectTimeout(10, TimeUnit.SECONDS);
+                    cache = new Cache(new File(Environment.getExternalStorageDirectory() + "/ejlchina/cache.tmp"), Long.valueOf(5 * 1024 * 1024));
                 }
             }
         }
@@ -43,13 +52,14 @@ public class OkHttpUtils {
     }
 
     public static void get(String url, OkHttpParams params, final OkHttpHandler handler) {
-        if (params != null) {
+        final Handler uiHandler = new Handler(Looper.getMainLooper());
+        if (params != null && params.haveData()) {
             for (Map.Entry<String, String> entry : params.urlParams.entrySet()) {
                 url += url.contains("?") ? "&" : "?";
                 url += entry.getKey() + "=" + entry.getValue();
             }
         }
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
+        uiHandler.post(new Runnable() {
             @Override
             public void run() {
                 handler.start();
@@ -59,7 +69,7 @@ public class OkHttpUtils {
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                uiHandler.post(new Runnable() {
                     @Override
                     public void run() {
                         handler.failure();
@@ -69,23 +79,85 @@ public class OkHttpUtils {
 
             @Override
             public void onResponse(Call call, final Response response) {
-                new Handler(Looper.getMainLooper()).post(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            handler.success(response.body().string());
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                try {
+                    final String result = response.body().string();
+                    uiHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            handler.success(result);
+                            if (EjlApplication.isDebug) {
+                                Log.d("vvv", result);
+                            }
+                        }
+                    });
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    uiHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
                             handler.failure();
                         }
+                    });
+                }
+            }
+        });
+    }
+
+    public static void getCache(String url, OkHttpParams params, final OkHttpHandler handler) {
+        final Handler uiHandler = new Handler(Looper.getMainLooper());
+        if (params != null && params.haveData()) {
+            for (Map.Entry<String, String> entry : params.urlParams.entrySet()) {
+                url += url.contains("?") ? "&" : "?";
+                url += entry.getKey() + "=" + entry.getValue();
+            }
+        }
+        uiHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                handler.start();
+            }
+        });
+        call = getClient().newBuilder().cache(cache).build().newCall(new Request.Builder().url(url).build());
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                uiHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        handler.failure();
                     }
                 });
+            }
+
+            @Override
+            public void onResponse(Call call, final Response response) {
+                try {
+                    final String result = response.body().string();
+                    uiHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            handler.success(result);
+                            if (EjlApplication.isDebug) {
+                                Log.d("vvv", result);
+                            }
+                        }
+                    });
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    uiHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            handler.failure();
+                        }
+                    });
+                }
             }
         });
     }
 
     public static void post(String url, OkHttpParams params, final OkHttpHandler handler) {
-        if (params.haveData()) {
+        final Handler uiHandler = new Handler(Looper.getMainLooper());
+        if (params != null && params.haveData()) {
             RequestBody body;
             if (!params.urlParams.isEmpty() && params.streamParams.isEmpty() && params.fileParams.isEmpty() && params.fileArrayParams.isEmpty()) {
                 FormBody.Builder builder = new FormBody.Builder();
@@ -114,7 +186,7 @@ public class OkHttpUtils {
                 }
                 body = builder.build();
             }
-            new Handler(Looper.getMainLooper()).post(new Runnable() {
+            uiHandler.post(new Runnable() {
                 @Override
                 public void run() {
                     handler.start();
@@ -124,7 +196,7 @@ public class OkHttpUtils {
             call.enqueue(new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
-                    new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    uiHandler.post(new Runnable() {
                         @Override
                         public void run() {
                             handler.failure();
@@ -135,10 +207,13 @@ public class OkHttpUtils {
                 @Override
                 public void onResponse(Call call, final Response response) throws IOException {
                     final String result = response.body().string();
-                    new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    uiHandler.post(new Runnable() {
                         @Override
                         public void run() {
                             handler.success(result);
+                            if (EjlApplication.isDebug) {
+                                Log.d("vvv", result);
+                            }
                         }
                     });
                 }
@@ -149,13 +224,14 @@ public class OkHttpUtils {
     }
 
     public static void downLoad(String url, OkHttpParams params, final OkHttpHandler handler) {
-        if (params != null) {
+        final Handler uiHandler = new Handler(Looper.getMainLooper());
+        if (params != null && params.haveData()) {
             for (Map.Entry<String, String> entry : params.urlParams.entrySet()) {
                 url += url.contains("?") ? "&" : "?";
                 url += entry.getKey() + "=" + entry.getValue();
             }
         }
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
+        uiHandler.post(new Runnable() {
             @Override
             public void run() {
                 handler.start();
@@ -169,10 +245,11 @@ public class OkHttpUtils {
                         .body(new OkHttpProgressResponseBody(originalResponse.body(), new OkHttpProgressListener() {
                             @Override
                             public void update(final long bytesRead, final long contentLength, final boolean done) {
-                                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                                uiHandler.post(new Runnable() {
                                     @Override
                                     public void run() {
                                         handler.progress(bytesRead, contentLength, done);
+                                        Log.d("vvv", bytesRead + "---" + contentLength + "---" + done);
                                     }
                                 });
                             }
@@ -181,7 +258,7 @@ public class OkHttpUtils {
         }).build().newCall(new Request.Builder().url(url).build()).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                uiHandler.post(new Runnable() {
                     @Override
                     public void run() {
                         handler.failure();
@@ -191,13 +268,14 @@ public class OkHttpUtils {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                handler.success(response.body().byteStream());
+                InputStream inputStream = response.body().byteStream();
+                handler.success(inputStream);
             }
         });
     }
 
     public static void cancelCall() {
-        if (!call.isExecuted()) {
+        if (call != null && !call.isExecuted()) {
             call.cancel();
         }
     }
