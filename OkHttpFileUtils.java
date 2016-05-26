@@ -6,7 +6,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * Created by admin on 2016/5/26.
+ * linshao    lhl_012@163.com
+ * 2016年5月26日18:03:34
+ * 流转化为为文件
  */
 public class OkHttpFileUtils {
     public static void inputstream2file(InputStream ins, File file) {

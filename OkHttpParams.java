@@ -10,6 +10,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * linshao    lhl_012@163.com
+ * 2016年5月26日18:03:34
+ * 来自async-http   可以放post体，get仅获取Map<String, String>内容
+ */
 public class OkHttpParams implements Serializable {
     public final static String APPLICATION_OCTET_STREAM = "application/octet-stream";
     public final static String APPLICATION_JSON = "application/json";

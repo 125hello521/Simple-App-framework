@@ -10,6 +10,11 @@ import okio.ForwardingSource;
 import okio.Okio;
 import okio.Source;
 
+/**
+ * linshao    lhl_012@163.com
+ * 2016年5月26日18:03:34
+ * 下载进度  摘自官网demo
+ */
 public class OkHttpProgressResponseBody extends ResponseBody {
     private final ResponseBody responseBody;
     private final ProgressListener progressListener;
