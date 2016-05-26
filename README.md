@@ -38,7 +38,7 @@ square 三件套    okhttp   retrofit   picasso（Glide）
                 tv.setText("failure()");
             }
             });
-            下载文件
+     下载文件
               OkHttpUtils.downLoad(jd, null, new OkHttpHandler() {
             @Override
             void progress(final long downloadSize, final long totalSize, final boolean is) {
