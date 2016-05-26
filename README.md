@@ -39,7 +39,7 @@ square 三件套    okhttp   retrofit   picasso（Glide）
             }
             });
      下载文件
-              OkHttpUtils.downLoad(jd, null, new OkHttpHandler() {
+            OkHttpUtils.downLoad(jd, null, new OkHttpHandler() {
             @Override
             void progress(final long downloadSize, final long totalSize, final boolean is) {
                 tv.setText(downloadSize + "---" + totalSize + "---" + is);
@@ -73,6 +73,9 @@ square 三件套    okhttp   retrofit   picasso（Glide）
 
             }
            });
--------------------------------------------------------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------------------------------------------------------
 Mark:下载文件成功返回InputStream，是异步线程，可以进行文件操作，且不占主线程，返回结果要在ui线程展示需要用runOnUiThread()方法
+
+OkHttp估计就到这里了，说句实话，东西还是自己按照实际做好，OkHttpParames这个东西并不好，放一个String-String，外加一个String-File（image）,然后填到RequestBody，耗时到49ms。以前用的async-http,现在想换框架，就做到此处。
+-------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------
+
