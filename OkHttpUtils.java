@@ -2,6 +2,7 @@ package com.net.volley;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -10,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
+import okhttp3.Interceptor;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
@@ -67,12 +69,6 @@ public class OkHttpUtils {
         });
     }
 
-    public static void cancelCall() {
-        if (!call.isExecuted()) {
-            call.cancel();
-        }
-    }
-
     public static void post(String url, OkHttpParams params, final OkHttpHandler handler) {
         if (params.haveData()) {
             RequestBody body = null;
@@ -123,6 +119,54 @@ public class OkHttpUtils {
                     handler.success(response.body().string());
                 }
             });
+        }
+    }
+
+    public static void downLoad(String url, OkHttpParams params, final OkHttpHandler handler) {
+        if (params != null) {
+            // Construct the query string and trim it, in case it
+            // includes any excessive white spaces.
+            ConcurrentHashMap<String, String> map = params.urlParams;
+            // Only add the query string if it isn't empty and it
+            // isn't equal to '?'.
+            if (map != null && !map.isEmpty()) {
+                Iterator iter = map.entrySet().iterator();
+                while (iter.hasNext()) {
+                    Map.Entry<String, String> entry = (Map.Entry<String, String>) iter.next();
+                    url += url.contains("?") ? "&" : "?";
+                    url += entry.getKey() + "=" + entry.getValue();
+                }
+            }
+        }
+        handler.start();
+        getClient().newBuilder().addNetworkInterceptor(new Interceptor() {
+            @Override
+            public Response intercept(Chain chain) throws IOException {
+                Response originalResponse = chain.proceed(chain.request());
+                return originalResponse.newBuilder()
+                        .body(new OkHttpProgressResponseBody(originalResponse.body(), new ProgressListener() {
+                            @Override
+                            public void update(long bytesRead, long contentLength, boolean done) {
+                                handler.progress(bytesRead, contentLength, done);
+                            }
+                        })).build();
+            }
+        }).build().newCall(new Request.Builder().url(url).build()).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                handler.failure();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                handler.success(response.body().byteStream());
+            }
+        });
+    }
+
+    public static void cancelCall() {
+        if (!call.isExecuted()) {
+            call.cancel();
         }
     }
 }
