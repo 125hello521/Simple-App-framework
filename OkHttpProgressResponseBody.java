@@ -17,10 +17,10 @@ import okio.Source;
  */
 public class OkHttpProgressResponseBody extends ResponseBody {
     private final ResponseBody responseBody;
-    private final ProgressListener progressListener;
+    private final OkHttpProgressListener progressListener;
     private BufferedSource bufferedSource;
 
-    public OkHttpProgressResponseBody(ResponseBody responseBody, ProgressListener progressListener) {
+    public OkHttpProgressResponseBody(ResponseBody responseBody, OkHttpProgressListener progressListener) {
         this.responseBody = responseBody;
         this.progressListener = progressListener;
     }

@@ -166,7 +166,7 @@ public class OkHttpUtils {
             public Response intercept(Chain chain) throws IOException {
                 Response originalResponse = chain.proceed(chain.request());
                 return originalResponse.newBuilder()
-                        .body(new OkHttpProgressResponseBody(originalResponse.body(), new ProgressListener() {
+                        .body(new OkHttpProgressResponseBody(originalResponse.body(), new OkHttpProgressListener() {
                             @Override
                             public void update(final long bytesRead, final long contentLength, final boolean done) {
                                 new Handler(Looper.getMainLooper()).post(new Runnable() {
