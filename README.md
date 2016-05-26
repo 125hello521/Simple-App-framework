@@ -19,17 +19,17 @@ square 三件套    okhttp   retrofit   picasso（Glide）
 -------------------------------------------------------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------------------------------------------------
 
-          get,post
-          OkHttpParams params = new OkHttpParams();
-        params.put("token", "186392761821464256312665");
-        try {
-            params.put("avatar", new File("/mnt/sdcard/DCIM/Camera/123.jpg"));
-        } catch (FileNotFoundException e) {
+     get,post
+            OkHttpParams params = new OkHttpParams();
+            params.put("token", "186392761821464256312665");
+            try {
+                params.put("avatar", new File("/mnt/sdcard/DCIM/Camera/123.jpg"));
+            } catch (FileNotFoundException e) {
             e.printStackTrace();
-        }
-        OkHttpUtils.post(post, params, new OkHttpHandler() {
-            @Override
-            void success(final String result) {
+            }
+            OkHttpUtils.post(post, params, new OkHttpHandler() {
+              @Override
+              void success(final String result) {
                 tv.setText(result);
             }
 
@@ -37,7 +37,7 @@ square 三件套    okhttp   retrofit   picasso（Glide）
             void failure() {
                 tv.setText("failure()");
             }
-        });
+            });
             下载文件
               OkHttpUtils.downLoad(jd, null, new OkHttpHandler() {
             @Override
@@ -72,7 +72,7 @@ square 三件套    okhttp   retrofit   picasso（Glide）
             void failure() {
 
             }
-        });
+           });
 -------------------------------------------------------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------------------------------------------------
 Mark:下载文件成功返回InputStream，是异步线程，可以进行文件操作，且不占主线程，返回结果要在ui线程展示需要用runOnUiThread()方法
