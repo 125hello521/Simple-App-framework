@@ -52,13 +52,6 @@ square 三件套    okhttp   retrofit   picasso（Glide）
             @Override
             void success(InputStream inputStream) {
                 file = new File("/mnt/sdcard/abc.apk");
-                if (!file.exists()) {
-                    try {
-                        file.createNewFile();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
                 OkHttpFileUtils.inputstream2file(inputStream, file);
                 runOnUiThread(new Runnable() {
                     @Override
