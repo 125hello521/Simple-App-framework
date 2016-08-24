@@ -2,6 +2,7 @@ package com.szrlh.wfcat.utils;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.szrlh.wfcat.bean.NetResultBean;
@@ -18,12 +19,12 @@ import okhttp3.Response;
  * Created by ejl_001 on 2016/8/24.
  */
 public abstract class OkCallBack<T> implements Callback {
-    private static final int IO_ = 1111;
-    private static final int JSON_ = 1112;
-    private static final int UNKNOW_ = 1113;
-    private static final int NET_ = 1114;
-    private static final int ADD_ = 1115;
-    private static final int OPERA_ = 1116;
+    private static final int IO_ = 1111;//IO错误
+    private static final int JSON_ = 1112;//JSON数据错误
+    private static final int UNKNOW_ = 1113;//未知
+    private static final int NET_ = 1114;//404
+    private static final int ADD_ = 1115;//服务器不见了
+    private static final int OPERA_ = 1116;//请求失败
 
     public void onStart() {
 
@@ -63,6 +64,7 @@ public abstract class OkCallBack<T> implements Callback {
     @Override
     public void onResponse(Call call, Response response) throws IOException {
         String json = response.body().string();
+        Log.d("ok", json);
         final NetResultBean netResult = new Gson().fromJson(json, NetResultBean.class);
         if (netResult.getCode() == 0) {
             try {
@@ -74,12 +76,20 @@ public abstract class OkCallBack<T> implements Callback {
                         onSuccess(t, netResult.getMessage());
                     }
                 });
-            } catch (Exception e) {
+            } catch (ClassCastException e) {
                 e.printStackTrace();
                 new Handler(Looper.getMainLooper()).post(new Runnable() {
                     @Override
                     public void run() {
-                        onError(OPERA_, netResult.getMessage());
+                        onSuccess(null, netResult.getMessage());
+                    }
+                });
+            } catch (IllegalStateException e) {
+                e.printStackTrace();
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                        onError(JSON_, "解析出错");
                     }
                 });
             }
@@ -87,7 +97,7 @@ public abstract class OkCallBack<T> implements Callback {
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override
                 public void run() {
-                    onError(JSON_, "数据异常");
+                    onError(OPERA_, netResult.getMessage());
                 }
             });
         }
