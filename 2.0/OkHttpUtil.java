@@ -29,7 +29,11 @@ public class OkHttpUtil {
     private static Call call;
     private static final String CACHE_DIE = "/mnt/sdcard/wfcat";
     //           120.27.149.167                      192.168.0.122
-    private final static String BaseUrl = "";
+    private final static String URL_ = "http://120.27.149.167:8888";
+
+    private final static String BaseUrl = URL_ + "/framexc/main/entrance.action?project=flm_jk&method=";
+
+    private final static String Head_Base = URL_ + "/framexc/";
 
     private static final Interceptor REWRITE_CACHE_CONTROL_INTERCEPTOR = new Interceptor() {
         @Override
@@ -82,8 +86,7 @@ public class OkHttpUtil {
 
     public static <T> void post(String url, RequestBody body, OkCallBack<T> callback) {
         callback.onStart();
-        Log.d("ok", BaseUrl + url);
-        call = getClient().newCall(new Request.Builder().url(BaseUrl + url).post(body).build());
+        call = getClient().newCall(new Request.Builder().url(Head_Base + url).post(body).build());
         call.enqueue(callback);
     }
 
