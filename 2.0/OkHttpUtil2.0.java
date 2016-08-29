@@ -29,7 +29,7 @@ public class OkHttpUtil {
     private static Call call;
     private static final String CACHE_DIE = "/mnt/sdcard/wfcat";
     //           120.27.149.167                      192.168.0.122
-    private final static String BaseUrl = "http://192.168.0.122:8888/framexc/main/entrance.action?project=flm_jk&method=";
+    private final static String BaseUrl = "";
 
     private static final Interceptor REWRITE_CACHE_CONTROL_INTERCEPTOR = new Interceptor() {
         @Override
