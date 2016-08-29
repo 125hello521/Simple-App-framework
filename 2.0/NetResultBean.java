@@ -4,14 +4,14 @@ import com.google.gson.JsonElement;
 
 /**
  * 网络请求返回结果Model
- * Created by admin on 2015/11/4.
+ * Created by 林少 on 2015/11/4.
  */
 public class NetResultBean<T> {
 
     /**
      * code : 0
      * message :
-     * backStr : {"name":"福利猫安卓版","url":"http://www.baidu.com","discript":"福利猫安卓版1.0.0新版上线","version":"1.0.0"}
+     * backStr : {"name":"安卓版","url":"http://www.baidu.com","discript":"安卓版1.0.0新版上线","version":"1.0.0"}
      */
 
     private int code;
